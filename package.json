@@ -1,0 +1,11 @@
+{
+  "name": "travel-app-api",
+  "version": "1.0.0",
+  "description": "travel-app-api",
+  "main": "index.ts",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "nottombraider",
+  "license": "ISC"
+}
