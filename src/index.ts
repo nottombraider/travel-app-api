@@ -100,9 +100,9 @@ const apiServer = express();
       };
 
       response.json(responseData);
-    } catch ({ message }) {
-      console.log(`Endpoint (/countries/:id) error: ${message}`);
-      response.status(406).send(message);
+    } catch (e) {
+      console.log(`Endpoint (/countries/:id) error:`, e);
+      response.status(406).send(e.message);
     }
   });
 
