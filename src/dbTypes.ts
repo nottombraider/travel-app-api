@@ -1,12 +1,12 @@
 import { ObjectID } from "mongodb";
 
-export type Lang = keyof LangDict;
-
 export type LangDict = {
   en: string;
   ru: string;
   pl: string;
 };
+
+export type Lang = keyof LangDict;
 
 export type CountryImage = {
   alt: LangDict;
