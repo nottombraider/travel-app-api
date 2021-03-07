@@ -1,9 +1,9 @@
 import { CountryDBObject } from "./dbTypes";
 import express from "express";
 import { config } from "dotenv";
-import { MongoClient } from "mongodb";
+import { MongoClient, ObjectID } from "mongodb";
 import { getLanguageFromRequest } from "./utils";
-import { CountriesList } from "./apiTypes";
+import { CountriesList, Country } from "./apiTypes";
 
 config();
 
@@ -59,6 +59,44 @@ const apiServer = express();
         };
       }
     );
+
+    response.json(responseData);
+  });
+
+  apiServer.get("/countries/:id", async (request, response) => {
+    const lang = getLanguageFromRequest(request);
+    const objectId = new ObjectID(request.params.id);
+
+    const { _id, name, image, galleryImages, description } = await db
+      .db("travelapp")
+      .collection<CountryDBObject>("countries")
+      .findOne(objectId);
+
+    const id = _id.toHexString();
+    const nameLang = name[lang];
+    const imageLang = {
+      ...image,
+      alt: image.alt[lang],
+    };
+    const galleryImagesLang = galleryImages.map(
+      ({ alt, description, ...items }) => {
+        const altLang = alt[lang];
+        const descriptionLang = description[lang];
+        return {
+          ...items,
+          alt: altLang,
+          description: descriptionLang,
+        };
+      }
+    );
+    const descriptionLang = description[lang];
+    const responseData = {
+      id,
+      name: nameLang,
+      image: imageLang,
+      galleryImages: galleryImagesLang,
+      description: descriptionLang,
+    };
 
     response.json(responseData);
   });
