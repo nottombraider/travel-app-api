@@ -1,10 +1,11 @@
-import { CountryDBObject } from "./dbTypes";
+import { CountryDBObject, UserDBObject } from "./dbTypes";
 import express from "express";
 import cors from "cors";
 import { config } from "dotenv";
 import { MongoClient, ObjectID } from "mongodb";
 import { getLanguageFromRequest } from "./utils";
-import { CountriesList, Country } from "./apiTypes";
+import { CountriesList } from "./apiTypes";
+import { urlencoded } from "body-parser";
 
 config();
 
@@ -12,6 +13,7 @@ const { DB_URL, PORT = 4000 } = process.env;
 const apiServer = express();
 
 apiServer.use(cors());
+apiServer.use(urlencoded({ extended: false }));
 
 (async () => {
   const db = new MongoClient(DB_URL);
@@ -106,6 +108,27 @@ apiServer.use(cors());
     } catch (e) {
       console.log(`Endpoint (/countries/:id) error:`, e);
       response.status(406).send(e.message);
+    }
+  });
+
+  apiServer.post("/registration", async (request, response) => {
+    console.log("REGISTRATION", request.body.login);
+    try {
+      const login = request.body.login;
+      const password = request.body.password;
+
+      const dbResponse = await db
+        .db("travelapp")
+        .collection<UserDBObject>("users")
+        .insertOne({
+          login,
+          password,
+        });
+      console.log("**", dbResponse);
+      response.json({});
+    } catch (error) {
+      console.log("Error:", error);
+      response.status(406).send(error.message);
     }
   });
 

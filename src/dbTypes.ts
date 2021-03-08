@@ -25,3 +25,8 @@ export type CountryDBObject = {
   >;
   description: LangDict;
 };
+
+export type UserDBObject = {
+  login: string;
+  password: string;
+};
