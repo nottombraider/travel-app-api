@@ -6,6 +6,7 @@ import { MongoClient, ObjectID } from "mongodb";
 import { getLanguageFromRequest } from "./utils";
 import { CountriesList } from "./apiTypes";
 import { urlencoded } from "body-parser";
+import { body, validationResult, CustomValidator } from "express-validator";
 
 config();
 
@@ -18,6 +19,18 @@ apiServer.use(urlencoded({ extended: false }));
 (async () => {
   const db = new MongoClient(DB_URL);
   await db.connect();
+
+  const isLoginValid: CustomValidator = (value) => {
+    return db
+      .db("travelapp")
+      .collection("users")
+      .findOne({ login: value })
+      .then((user) => {
+        if (user) {
+          return Promise.reject("Login is already taken");
+        }
+      });
+  };
 
   apiServer.get("/countries", async (request, response) => {
     const lang = getLanguageFromRequest(request);
@@ -111,26 +124,50 @@ apiServer.use(urlencoded({ extended: false }));
     }
   });
 
-  apiServer.post("/registration", async (request, response) => {
-    console.log("REGISTRATION", request.body.login);
-    try {
-      const login = request.body.login;
-      const password = request.body.password;
+  apiServer.post(
+    "/registration",
 
-      const dbResponse = await db
-        .db("travelapp")
-        .collection<UserDBObject>("users")
-        .insertOne({
+    body("login")
+      .isLength({ min: 4 })
+      .withMessage("must be at least 4 chars long"),
+    body("password")
+      .isLength({ min: 6, max: 15 })
+      .withMessage("must be from 6 to 15 chars long")
+      .matches(/\d/)
+      .withMessage("must contain a number")
+      .matches(/\w/)
+      .withMessage("must contain a letter"),
+
+    async (request, response) => {
+      const errors = validationResult(request);
+
+      if (!errors.isEmpty()) {
+        return response.status(400).json({ errors: errors.array() });
+      }
+
+      try {
+        const login = request.body.login;
+
+        await isLoginValid(login, request.body);
+
+        const password = request.body.password;
+        const dbResponse = await db
+          .db("travelapp")
+          .collection<UserDBObject>("users")
+          .insertOne({
+            login,
+            password,
+          });
+
+        response.status(200).json({
           login,
-          password,
         });
-      console.log("**", dbResponse);
-      response.json({});
-    } catch (error) {
-      console.log("Error:", error);
-      response.status(406).send(error.message);
+      } catch (error) {
+        console.log("Error:", error);
+        response.status(406).send(error.message);
+      }
     }
-  });
+  );
 
   apiServer.listen(PORT, () => {
     console.log(`Example app listening at http://localhost:${PORT}`);
