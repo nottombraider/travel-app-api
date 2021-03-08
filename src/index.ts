@@ -1,5 +1,6 @@
 import { CountryDBObject } from "./dbTypes";
 import express from "express";
+import cors from "cors";
 import { config } from "dotenv";
 import { MongoClient, ObjectID } from "mongodb";
 import { getLanguageFromRequest } from "./utils";
@@ -7,8 +8,10 @@ import { CountriesList, Country } from "./apiTypes";
 
 config();
 
-const { DB_URL, PORT = 3000 } = process.env;
+const { DB_URL, PORT = 4000 } = process.env;
 const apiServer = express();
+
+apiServer.use(cors());
 
 (async () => {
   const db = new MongoClient(DB_URL);
