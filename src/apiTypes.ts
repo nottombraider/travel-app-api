@@ -7,6 +7,14 @@ export type CountryImage = {
 export type Country = {
   id: string;
   name: string;
+  location: {
+    lat: string;
+    long: string;
+  };
+  timezone: string;
+  alpha2Code: string;
+  currencyCode: string;
+  video: string;
   image: CountryImage;
   galleryImages: Array<
     CountryImage & {

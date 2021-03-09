@@ -4,6 +4,14 @@ export const mockCountriesList: CountriesList = [
   {
     id: "6043d483656ac305b15f314c",
     name: "Польша",
+    location: {
+      lat: "51.9194",
+      long: "19.1451",
+    },
+    timezone: "Warsaw/Poland",
+    alpha2Code: "PL",
+    currencyCode: "PLN",
+    video: "https://www.youtube.com/watch?v=ekz6i58kVpI&t=221s",
     image: {
       alt: "Варшава, Польша",
       thumbnail:

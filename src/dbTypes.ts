@@ -17,6 +17,14 @@ export type CountryImage = {
 export type CountryDBObject = {
   _id: ObjectID;
   name: LangDict;
+  location: {
+    lat: string;
+    long: string;
+  };
+  timezone: LangDict;
+  alpha2Code: string;
+  currencyCode: string;
+  video: string;
   image: CountryImage;
   galleryImages: Array<
     CountryImage & {
