@@ -6,7 +6,7 @@ import { MongoClient, ObjectID } from "mongodb";
 import { getLanguageFromRequest } from "./utils";
 import { CountriesList } from "./apiTypes";
 import { urlencoded } from "body-parser";
-import { body, validationResult, CustomValidator } from "express-validator";
+import { body, CustomValidator, validationResult } from "express-validator";
 
 config();
 
@@ -20,8 +20,8 @@ apiServer.use(urlencoded({ extended: false }));
   const db = new MongoClient(DB_URL);
   await db.connect();
 
-  const isLoginValid: CustomValidator = (value) => {
-    return db
+  const isLoginValid: CustomValidator = async (value) => {
+    return await db
       .db("travelapp")
       .collection("users")
       .findOne({ login: value })
@@ -48,8 +48,20 @@ apiServer.use(urlencoded({ extended: false }));
       .toArray();
 
     const responseData: CountriesList = dbCountriesList.map(
-      ({ id, name, image, galleryImages, description }) => {
+      ({
+        id,
+        name,
+        location,
+        timezone,
+        alpha2Code,
+        currencyCode,
+        video,
+        image,
+        galleryImages,
+        description,
+      }) => {
         const nameLang = name[lang];
+        const timezoneLang = timezone[lang];
         const imageLang = {
           ...image,
           alt: image.alt[lang],
@@ -65,12 +77,16 @@ apiServer.use(urlencoded({ extended: false }));
             };
           }
         );
-
         const descriptionLang = description[lang];
 
         return {
           id,
           name: nameLang,
+          location,
+          timezone: timezoneLang,
+          alpha2Code,
+          currencyCode,
+          video,
           image: imageLang,
           galleryImages: galleryImagesLang,
           description: descriptionLang,
@@ -142,7 +158,7 @@ apiServer.use(urlencoded({ extended: false }));
       const errors = validationResult(request);
 
       if (!errors.isEmpty()) {
-        return response.status(400).json({ errors: errors.array() });
+        return response.status(400).json({ errors: errors });
       }
 
       try {
@@ -151,13 +167,10 @@ apiServer.use(urlencoded({ extended: false }));
         await isLoginValid(login, request.body);
 
         const password = request.body.password;
-        const dbResponse = await db
-          .db("travelapp")
-          .collection<UserDBObject>("users")
-          .insertOne({
-            login,
-            password,
-          });
+        await db.db("travelapp").collection<UserDBObject>("users").insertOne({
+          login,
+          password,
+        });
 
         response.status(200).json({
           login,
