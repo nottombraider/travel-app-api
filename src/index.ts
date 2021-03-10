@@ -4,7 +4,7 @@ import cors from "cors";
 import { config } from "dotenv";
 import { MongoClient, ObjectID } from "mongodb";
 import { getLanguageFromRequest } from "./utils";
-import { CountriesList } from "./apiTypes";
+import { CountriesList, Country } from "./apiTypes";
 import { urlencoded } from "body-parser";
 import { body, CustomValidator, validationResult } from "express-validator";
 
@@ -61,7 +61,6 @@ apiServer.use(urlencoded({ extended: false }));
         description,
       }) => {
         const nameLang = name[lang];
-        const timezoneLang = timezone[lang];
         const imageLang = {
           ...image,
           alt: image.alt[lang],
@@ -83,7 +82,7 @@ apiServer.use(urlencoded({ extended: false }));
           id,
           name: nameLang,
           location,
-          timezone: timezoneLang,
+          timezone,
           alpha2Code,
           currencyCode,
           video,
@@ -102,7 +101,18 @@ apiServer.use(urlencoded({ extended: false }));
       const lang = getLanguageFromRequest(request);
       const objectId = new ObjectID(request.params.id);
 
-      const { _id, name, image, galleryImages, description } = await db
+      const {
+        _id,
+        name,
+        location,
+        timezone,
+        alpha2Code,
+        currencyCode,
+        video,
+        image,
+        galleryImages,
+        description,
+      } = await db
         .db("travelapp")
         .collection<CountryDBObject>("countries")
         .findOne(objectId);
@@ -125,9 +135,14 @@ apiServer.use(urlencoded({ extended: false }));
         }
       );
       const descriptionLang = description[lang];
-      const responseData = {
+      const responseData: Country = {
         id,
         name: nameLang,
+        location,
+        timezone,
+        alpha2Code,
+        currencyCode,
+        video,
         image: imageLang,
         galleryImages: galleryImagesLang,
         description: descriptionLang,

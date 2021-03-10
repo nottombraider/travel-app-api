@@ -21,7 +21,7 @@ export type CountryDBObject = {
     lat: string;
     long: string;
   };
-  timezone: LangDict;
+  timezone: string;
   alpha2Code: string;
   currencyCode: string;
   video: string;
