@@ -9,7 +9,7 @@ export const mockCountriesList: CountriesList = [
       long: "19.1451",
     },
     timezone: "Warsaw/Poland",
-    alpha2Code: "PL",
+    alpha3Code: "POL",
     currencyCode: "PLN",
     video: "https://www.youtube.com/watch?v=ekz6i58kVpI&t=221s",
     image: {

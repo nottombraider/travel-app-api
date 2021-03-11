@@ -12,7 +12,7 @@ export type Country = {
     long: string;
   };
   timezone: string;
-  alpha2Code: string;
+  alpha3Code: string;
   currencyCode: string;
   video: string;
   image: CountryImage;
