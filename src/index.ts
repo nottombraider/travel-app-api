@@ -7,22 +7,25 @@ import { getLanguageFromRequest } from "./utils";
 import { CountriesList, Country } from "./apiTypes";
 import { urlencoded } from "body-parser";
 import { body, CustomValidator, validationResult } from "express-validator";
+import cookieParser from "cookie-parser";
 
 config();
 
 const { DB_URL, PORT = 4000 } = process.env;
+
 const apiServer = express();
 
 apiServer.use(cors());
 apiServer.use(urlencoded({ extended: false }));
+apiServer.use(cookieParser());
 
 (async () => {
   const db = new MongoClient(DB_URL);
   await db.connect();
+  const travelapp = db.db("travelapp");
 
   const isLoginValid: CustomValidator = async (value) => {
-    return await db
-      .db("travelapp")
+    return await travelapp
       .collection("users")
       .findOne({ login: value })
       .then((user) => {
@@ -35,8 +38,7 @@ apiServer.use(urlencoded({ extended: false }));
   apiServer.get("/countries", async (request, response) => {
     const lang = getLanguageFromRequest(request);
 
-    const dbCountriesList = await db
-      .db("travelapp")
+    const dbCountriesList = await travelapp
       .collection<CountryDBObject>("countries")
       .find()
       .map(({ _id, ...items }) => {
@@ -112,8 +114,7 @@ apiServer.use(urlencoded({ extended: false }));
         image,
         galleryImages,
         description,
-      } = await db
-        .db("travelapp")
+      } = await travelapp
         .collection<CountryDBObject>("countries")
         .findOne(objectId);
 
@@ -182,20 +183,50 @@ apiServer.use(urlencoded({ extended: false }));
         await isLoginValid(login, request.body);
 
         const password = request.body.password;
-        await db.db("travelapp").collection<UserDBObject>("users").insertOne({
+        await travelapp.collection<UserDBObject>("users").insertOne({
           login,
           password,
         });
 
-        response.status(200).json({
-          login,
-        });
+        response
+          .cookie("authorization", true, { maxAge: 3600000 })
+          .status(200)
+          .json("registration success");
       } catch (error) {
         console.log("Error:", error);
         response.status(406).send(error.message);
       }
     }
   );
+
+  apiServer.post("/login", async (request, response) => {
+    try {
+      const login = request.body.login;
+      const password = request.body.password;
+
+      const responseDBLogin = await travelapp
+        .collection<UserDBObject>("users")
+        .findOne({
+          login,
+        });
+
+      const responseDBPassword = responseDBLogin.password === password;
+
+      if (!responseDBLogin) response.status(401).json("invalid login");
+
+      if (!responseDBPassword) response.status(401).json("invalid password");
+
+      return response
+        .cookie("authorization", responseDBLogin._id.toHexString(), {
+          maxAge: 3600000,
+        })
+        .status(200)
+        .json("authorized");
+    } catch (error) {
+      console.log("Error:", error);
+      response.status(406).send(error.message);
+    }
+  });
 
   apiServer.listen(PORT, () => {
     console.log(`Example app listening at http://localhost:${PORT}`);

@@ -35,6 +35,7 @@ export type CountryDBObject = {
 };
 
 export type UserDBObject = {
+  _id: ObjectID;
   login: string;
   password: string;
 };
