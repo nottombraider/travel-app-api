@@ -4,7 +4,7 @@ API for travel-app
 
 ##Deploy:
 
-- [Deploy on Heroku travel-app](https://oktravel.herokuapp.com/) ![Heroku](https://pyheroku-badge.herokuapp.com/?app=oktravel&style=plastic)
+- [Deploy on Heroku travel-app](https://oktravel.herokuapp.com/)
 - Available endpoints:
 
   - `/countries` - to receive list of countries;
