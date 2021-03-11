@@ -5,8 +5,6 @@ export const getUserCurrentUserInfo = (apiServer: Express, travelappDB: Db) =>
   apiServer.get("/user-info", async (request, response) => {
     const userCookie = request.cookies.authorization;
 
-    console.log(userCookie);
-
     if (userCookie === undefined) {
       return response.status(401).send("auth. cookie missing");
     }
