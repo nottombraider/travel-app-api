@@ -2,13 +2,16 @@ import { Db } from "mongodb";
 import { UserDBObject } from "../dbTypes";
 import { Express } from "express";
 
-export const userLogin = (apiServer: Express, travelapp: Db) =>
+const env = process.env.NODE_ENV;
+const isProduction = env === "production";
+
+export const userLogin = (apiServer: Express, travelappDB: Db) =>
   apiServer.post("/login", async (request, response) => {
     try {
       const login = request.body.login;
       const password = request.body.password;
 
-      const responseDBLogin = await travelapp
+      const responseDBLogin = await travelappDB
         .collection<UserDBObject>("users")
         .findOne({
           login,
@@ -16,18 +19,19 @@ export const userLogin = (apiServer: Express, travelapp: Db) =>
 
       const responseDBPassword = responseDBLogin.password === password;
 
-      if (!responseDBLogin) response.status(401).json("invalid login");
+      if (!responseDBLogin) response.status(401).send("invalid login");
 
-      if (!responseDBPassword) response.status(401).json("invalid password");
+      if (!responseDBPassword) response.status(401).send("invalid password");
 
       return response
         .cookie("authorization", responseDBLogin._id.toHexString(), {
           maxAge: 3600000,
+          httpOnly: true,
+          secure: isProduction,
         })
         .status(200)
-        .json("authorized");
+        .send("authorized");
     } catch (error) {
-      console.log("Error:", error);
-      response.status(406).send(error.message);
+      response.status(406).send("auth. failed: user does not exist");
     }
   });

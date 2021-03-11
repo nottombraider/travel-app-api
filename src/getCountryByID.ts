@@ -4,7 +4,7 @@ import { CountryDBObject } from "./dbTypes";
 import { Express } from "express";
 import { getLanguageFromRequest } from "./utils";
 
-export const getCountryByID = (apiServer: Express, travelapp: Db) =>
+export const getCountryByID = (apiServer: Express, travelappDB: Db) =>
   apiServer.get("/countries/:id", async (request, response) => {
     try {
       const lang = getLanguageFromRequest(request);
@@ -21,7 +21,7 @@ export const getCountryByID = (apiServer: Express, travelapp: Db) =>
         image,
         galleryImages,
         description,
-      } = await travelapp
+      } = await travelappDB
         .collection<CountryDBObject>("countries")
         .findOne(objectId);
 

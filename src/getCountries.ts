@@ -4,11 +4,11 @@ import { CountriesList } from "./apiTypes";
 import { CountryDBObject } from "./dbTypes";
 import { getLanguageFromRequest } from "./utils";
 
-export const getCountries = (apiServer: Express, travelapp: Db) =>
+export const getCountries = (apiServer: Express, travelappDB: Db) =>
   apiServer.get("/countries", async (request, response) => {
     const lang = getLanguageFromRequest(request);
 
-    const dbCountriesList = await travelapp
+    const dbCountriesList = await travelappDB
       .collection<CountryDBObject>("countries")
       .find()
       .map(({ _id, ...items }) => {

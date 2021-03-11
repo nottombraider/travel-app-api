@@ -4,7 +4,7 @@ import { UserDBObject } from "../dbTypes";
 import { Express } from "express";
 import { isLoginValid } from "../utils";
 
-export const userRegistration = (apiServer: Express, travelapp: Db) =>
+export const userRegistration = (apiServer: Express, travelappDB: Db) =>
   apiServer.post(
     "/registration",
 
@@ -32,15 +32,12 @@ export const userRegistration = (apiServer: Express, travelapp: Db) =>
         await isLoginValid(login, request.body);
 
         const password = request.body.password;
-        await travelapp.collection<UserDBObject>("users").insertOne({
+        await travelappDB.collection<UserDBObject>("users").insertOne({
           login,
           password,
         });
 
-        response
-          .cookie("authorization", true, { maxAge: 3600000 })
-          .status(200)
-          .json("registration success");
+        response.status(200).send("registration success");
       } catch (error) {
         console.log("Error:", error);
         response.status(406).send(error.message);

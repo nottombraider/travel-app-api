@@ -1,17 +1,13 @@
-import { userLogin } from "./users/userLogin";
-import { userRegistration } from "./users/userRegistration";
-import { getCountryByID } from "./getCountryByID";
 import express from "express";
-import { MongoClient, ObjectID } from "mongodb";
+import { MongoClient } from "mongodb";
 import cors from "cors";
 import cookieParser from "cookie-parser";
 import { config } from "dotenv";
 import { urlencoded } from "body-parser";
 
 import { getCountries } from "./getCountries";
-
-import { Country } from "./apiTypes";
-import { CountryDBObject, UserDBObject } from "./dbTypes";
+import { getCountryByID } from "./getCountryByID";
+import { userRegistration, userLogin, getUserCurrentUserInfo } from "./users";
 
 config();
 
@@ -26,15 +22,17 @@ apiServer.use(cookieParser());
 (async () => {
   const db = new MongoClient(DB_URL);
   await db.connect();
-  const travelapp = db.db("travelapp");
+  const travelappDB = db.db("travelapp");
 
-  getCountries(apiServer, travelapp);
+  getCountries(apiServer, travelappDB);
 
-  getCountryByID(apiServer, travelapp);
+  getCountryByID(apiServer, travelappDB);
 
-  userRegistration(apiServer, travelapp);
+  userRegistration(apiServer, travelappDB);
 
-  userLogin(apiServer, travelapp);
+  userLogin(apiServer, travelappDB);
+
+  getUserCurrentUserInfo(apiServer, travelappDB);
 
   apiServer.listen(PORT, () => {
     console.log(`Example app listening at http://localhost:${PORT}`);
