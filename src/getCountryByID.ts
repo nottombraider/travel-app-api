@@ -13,6 +13,7 @@ export const getCountryByID = (apiServer: Express, travelappDB: Db) =>
       const {
         _id,
         name,
+        capital,
         location,
         timezone,
         alpha3Code,
@@ -27,6 +28,7 @@ export const getCountryByID = (apiServer: Express, travelappDB: Db) =>
 
       const id = _id.toHexString();
       const nameLang = name[lang];
+      const capitalLang = capital[lang];
       const imageLang = {
         ...image,
         alt: image.alt[lang],
@@ -46,6 +48,7 @@ export const getCountryByID = (apiServer: Express, travelappDB: Db) =>
       const responseData: Country = {
         id,
         name: nameLang,
+        capital: capitalLang,
         location,
         timezone,
         alpha3Code,

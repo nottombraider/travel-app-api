@@ -17,6 +17,7 @@ export type CountryImage = {
 export type CountryDBObject = {
   _id: ObjectID;
   name: LangDict;
+  capital: LangDict;
   location: {
     lat: string;
     long: string;
@@ -34,8 +35,13 @@ export type CountryDBObject = {
   description: LangDict;
 };
 
+export type Rating = Pick<CountryDBObject, "_id"> & {
+  rating: number;
+};
+
 export type UserDBObject = {
   _id: ObjectID;
   login: string;
   password: string;
+  votes?: Array<Rating>;
 };

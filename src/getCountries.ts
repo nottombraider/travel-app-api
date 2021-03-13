@@ -23,6 +23,7 @@ export const getCountries = (apiServer: Express, travelappDB: Db) =>
       ({
         id,
         name,
+        capital,
         location,
         timezone,
         alpha3Code,
@@ -33,6 +34,7 @@ export const getCountries = (apiServer: Express, travelappDB: Db) =>
         description,
       }) => {
         const nameLang = name[lang];
+        const capitalLang = capital[lang];
         const imageLang = {
           ...image,
           alt: image.alt[lang],
@@ -53,6 +55,7 @@ export const getCountries = (apiServer: Express, travelappDB: Db) =>
         return {
           id,
           name: nameLang,
+          capital: capitalLang,
           location,
           timezone,
           alpha3Code,

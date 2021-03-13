@@ -7,6 +7,7 @@ export type CountryImage = {
 export type Country = {
   id: string;
   name: string;
+  capital: string;
   location: {
     lat: string;
     long: string;

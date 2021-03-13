@@ -4,6 +4,7 @@ export const mockCountriesList: CountriesList = [
   {
     id: "6043d483656ac305b15f314c",
     name: "Польша",
+    capital: "Варшава",
     location: {
       lat: "51.9194",
       long: "19.1451",
