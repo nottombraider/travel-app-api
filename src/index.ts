@@ -1,7 +1,6 @@
 import express from "express";
 import { MongoClient } from "mongodb";
 import cors from "cors";
-import cookieParser from "cookie-parser";
 import { config } from "dotenv";
 import { urlencoded } from "body-parser";
 
@@ -17,7 +16,6 @@ const apiServer = express();
 
 apiServer.use(cors());
 apiServer.use(urlencoded({ extended: false }));
-apiServer.use(cookieParser());
 
 (async () => {
   const db = new MongoClient(DB_URL);

@@ -1,20 +1,25 @@
-import { UserDBObject } from "./../dbTypes";
+import { SessionDBObject, UserDBObject } from "./../dbTypes";
 import { Express } from "express";
-import { Db, ObjectID } from "mongodb";
+import { Db } from "mongodb";
+import { validate } from "uuid";
+
 export const getUserCurrentUserInfo = (apiServer: Express, travelappDB: Db) =>
   apiServer.get("/user-info", async (request, response) => {
-    const userCookie = request.cookies.authorization;
+    const uuidString = request.headers.authorization;
 
-    if (userCookie === undefined) {
-      return response.status(401).send("auth. cookie missing");
+    if(!validate(uuidString)){
+      return response.status(403).send("invalid authorization token");
     }
 
     try {
-      const id = new ObjectID(userCookie);
+      const { userId } = await travelappDB.collection<SessionDBObject>("sessions").findOne({
+        token: uuidString
+      });
+
       const responseDB = await travelappDB
         .collection<UserDBObject>("users")
         .findOne({
-          _id: id,
+          _id: userId,
         });
 
       if (responseDB)

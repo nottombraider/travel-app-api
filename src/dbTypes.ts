@@ -45,3 +45,10 @@ export type UserDBObject = {
   password: string;
   votes?: Array<Rating>;
 };
+
+export type SessionDBObject = {
+  _id: ObjectID,
+  createdAt: Date,
+  userId: ObjectID,
+  token: string
+};

@@ -1,6 +1,7 @@
 import { Db } from "mongodb";
-import { UserDBObject } from "../dbTypes";
+import { SessionDBObject, UserDBObject } from "../dbTypes";
 import { Express } from "express";
+import { v4 as uuidv4 } from "uuid";
 
 const env = process.env.NODE_ENV;
 const isProduction = env === "production";
@@ -23,14 +24,15 @@ export const userLogin = (apiServer: Express, travelappDB: Db) =>
 
       if (!responseDBPassword) response.status(401).send("invalid password");
 
-      return response
-        .cookie("authorization", responseDBLogin._id.toHexString(), {
-          maxAge: 3600000,
-          httpOnly: true,
-          secure: isProduction,
-        })
-        .status(200)
-        .send("authorized");
+      const token = uuidv4();
+
+      await travelappDB.collection<SessionDBObject>("sessions").insertOne({
+        createdAt: new Date(),
+        userId: responseDBLogin._id,
+        token
+      })
+
+      return response.json({token});
     } catch (error) {
       response.status(406).send("auth. failed: user does not exist");
     }
