@@ -7,6 +7,7 @@ import { urlencoded } from "body-parser";
 import { getCountries } from "./getCountries";
 import { getCountryByID } from "./getCountryByID";
 import { userRegistration, userLogin, getUserCurrentUserInfo } from "./users";
+import { setVote } from "./setVote";
 
 config();
 
@@ -31,6 +32,8 @@ apiServer.use(urlencoded({ extended: false }));
   userLogin(apiServer, travelappDB);
 
   getUserCurrentUserInfo(apiServer, travelappDB);
+
+  setVote(apiServer, travelappDB);
 
   apiServer.listen(PORT, () => {
     console.log(`Example app listening at http://localhost:${PORT}`);

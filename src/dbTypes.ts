@@ -47,8 +47,15 @@ export type UserDBObject = {
 };
 
 export type SessionDBObject = {
-  _id: ObjectID,
-  createdAt: Date,
-  userId: ObjectID,
-  token: string
+  _id: ObjectID;
+  createdAt: Date;
+  userId: ObjectID;
+  token: string;
 };
+
+export type VoteDBObject = {
+  _id: ObjectID;
+  userId: ObjectID;
+  countryId: ObjectID;
+  rating: number;
+}

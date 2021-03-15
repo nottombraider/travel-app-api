@@ -12,12 +12,8 @@ export const userRegistration = (apiServer: Express, travelappDB: Db) =>
       .isLength({ min: 4 })
       .withMessage("must be at least 4 chars long"),
     body("password")
-      .isLength({ min: 6, max: 15 })
-      .withMessage("must be from 6 to 15 chars long")
-      .matches(/\d/)
-      .withMessage("must contain a number")
-      .matches(/\w/)
-      .withMessage("must contain a letter"),
+      .isLength({ min: 4 })
+      .withMessage("must be at least 4 chars long"),
 
     async (request, response) => {
       const errors = validationResult(request);
