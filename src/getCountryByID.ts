@@ -10,23 +10,64 @@ export const getCountryByID = (apiServer: Express, travelappDB: Db) =>
       const lang = getLanguageFromRequest(request);
       const objectId = new ObjectID(request.params.id);
 
-      const {
-        _id,
-        name,
-        capital,
-        location,
-        timezone,
-        alpha3Code,
-        currencyCode,
-        video,
-        image,
-        galleryImages,
-        description,
-      } = await travelappDB
-        .collection<CountryDBObject>("countries")
-        .findOne(objectId);
+      const [item] = await travelappDB
+        .collection<CountryDBObject & Pick<Country, "id"|"votes"|"rating">>("countries")
+        .aggregate([
+          {
+            $match: {_id: objectId}
+          },
+          {
+            '$lookup': {
+              'from': 'votes', 
+              'let': {
+                'countryId': '$_id'
+              }, 
+              'pipeline': [
+                {
+                  '$match': {
+                    '$expr': {
+                      'countryId': '$$countryId'
+                    }
+                  }
+                }, {
+                  '$project': {
+                    '_id': false, 
+                    'rating': true, 
+                    'userName': true
+                  }
+                }
+              ], 
+              'as': 'votes'
+            }
+          }, {
+            '$addFields': {
+              'rating': {
+                '$avg': '$votes.rating'
+              }, 
+              'id': {
+                '$toString': '$_id'
+              }
+            }
+          }, {
+            '$unset': '_id'
+          }
+        ]
+        ).toArray();
 
-      const id = _id.toHexString();
+        const {
+          id,
+          name,
+          capital,
+          location,
+          timezone,
+          alpha3Code,
+          currencyCode,
+          video,
+          image,
+          galleryImages,
+          description,
+          ...rest
+        } =  item;
       const nameLang = name[lang];
       const capitalLang = capital[lang];
       const imageLang = {
@@ -57,6 +98,7 @@ export const getCountryByID = (apiServer: Express, travelappDB: Db) =>
         image: imageLang,
         galleryImages: galleryImagesLang,
         description: descriptionLang,
+        ...rest
       };
 
       response.json(responseData);
