@@ -1,55 +1,65 @@
-import { Db, ObjectID } from "mongodb";
-import { Express } from "express";
-import { CountryDBObject } from "./dbTypes";
-import { getLanguageFromRequest } from "./utils";
-import { CountriesList, Country } from "./apiTypes";
+import { Db } from 'mongodb';
+import { Express } from 'express';
+import { CountryDBObject } from './dbTypes';
+import { getLanguageFromRequest } from './utils';
+import { CountriesList, Country } from './apiTypes';
 
-export const getCountries = (apiServer: Express, travelappDB: Db) =>
-  apiServer.get("/countries", async (request, response) => {
+export const getCountries = (apiServer: Express, travelappDB: Db): Express =>
+  apiServer.get('/countries', async (request, response) => {
     const lang = getLanguageFromRequest(request);
 
     const dbCountriesList = await travelappDB
-      .collection<CountryDBObject & Pick<Country, "id"|"votes"|"rating">>("countries")
+      .collection<CountryDBObject & Pick<Country, 'id' | 'votes' | 'rating'>>(
+        'countries'
+      )
       .aggregate([
         {
-          '$lookup': {
-            'from': 'votes', 
-            'let': {
-              'countryId': '$_id'
-            }, 
-            'pipeline': [
+          $lookup: {
+            from: 'votes',
+            let: {
+              countryId: '$_id'
+            },
+            pipeline: [
               {
-                '$match': {
-                  '$expr': {
-                    'countryId': '$$countryId'
+                $match: {
+                  $expr: {
+                    $eq: ['$countryId', '$$countryId']
                   }
                 }
-              }, {
-                '$project': {
-                  '_id': false, 
-                  'rating': true, 
-                  'userName': true
+              },
+              {
+                $project: {
+                  _id: false,
+                  countryId: true,
+                  rating: true,
+                  userName: true,
+                  ts: '$$countryId'
                 }
               }
-            ], 
-            'as': 'votes'
+            ],
+            as: 'votes'
           }
-        }, {
-          '$addFields': {
-            'rating': {
-              '$avg': '$votes.rating'
-            }, 
-            'id': {
-              '$toString': '$_id'
+        },
+        {
+          $addFields: {
+            rating: {
+              $ifNull: [
+                {
+                  $avg: '$votes.rating'
+                },
+                0
+              ]
+            },
+            id: {
+              $toString: '$_id'
             }
           }
-        }, {
-          '$unset': '_id'
+        },
+        {
+          $unset: '_id'
         }
-      ]
-      )
+      ])
       .toArray();
-
 
     const responseData: CountriesList = dbCountriesList.map(
       ({
@@ -70,7 +80,7 @@ export const getCountries = (apiServer: Express, travelappDB: Db) =>
         const capitalLang = capital[lang];
         const imageLang = {
           ...image,
-          alt: image.alt[lang],
+          alt: image.alt[lang]
         };
         const galleryImagesLang = galleryImages.map(
           ({ alt, description, ...items }) => {
@@ -79,7 +89,7 @@ export const getCountries = (apiServer: Express, travelappDB: Db) =>
             return {
               ...items,
               alt: altLang,
-              description: descriptionLang,
+              description: descriptionLang
             };
           }
         );
