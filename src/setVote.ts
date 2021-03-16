@@ -1,7 +1,7 @@
 import { Express } from "express";
 import { Db, ObjectID } from "mongodb";
 import { validate } from "uuid";
-import { SessionDBObject, VoteDBObject } from "./dbTypes";
+import { SessionDBObject, UserDBObject, VoteDBObject } from "./dbTypes";
 
 export const setVote = (apiServer: Express, travelappDB: Db) => 
 apiServer.post("/countries/:id/vote", async (request, response) => {
@@ -15,6 +15,9 @@ apiServer.post("/countries/:id/vote", async (request, response) => {
     const { userId } = await travelappDB.collection<SessionDBObject>("sessions").findOne({
       token: uuidString
     });
+    const user = await travelappDB.collection<UserDBObject>("users").findOne({
+      _id: userId
+    });
     const {rating} = request.body;
     const countryIDObj = new ObjectID(request.params.id);
 
@@ -24,6 +27,7 @@ apiServer.post("/countries/:id/vote", async (request, response) => {
      }, {
        $set: {
         userId,
+        userName: user ? user.login : null,
         countryId: countryIDObj,
         rating: Number(rating),
       }
