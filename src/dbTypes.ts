@@ -1,4 +1,4 @@
-import { ObjectID } from "mongodb";
+import { ObjectID } from 'mongodb';
 
 export type LangDict = {
   en: string;
@@ -35,7 +35,7 @@ export type CountryDBObject = {
   description: LangDict;
 };
 
-export type Rating = Pick<CountryDBObject, "_id"> & {
+export type Rating = Pick<CountryDBObject, '_id'> & {
   rating: number;
 };
 
@@ -58,4 +58,4 @@ export type VoteDBObject = {
   userId: ObjectID;
   countryId: ObjectID;
   rating: number;
-}
+};

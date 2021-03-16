@@ -23,7 +23,7 @@ export type Country = {
     }
   >;
   description: string;
-  votes: Array<{userName: string, rating: number}>; //calculated type
+  votes: Array<{ userName: string; rating: number }>; //calculated type
   rating: number; //calculated type
 };
 
