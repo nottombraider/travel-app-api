@@ -5,7 +5,7 @@ export type CountryImage = {
 };
 
 export type Country = {
-  id: string;
+  id: string; //calculated type
   name: string;
   capital: string;
   location: {
@@ -23,6 +23,8 @@ export type Country = {
     }
   >;
   description: string;
+  votes: Array<{userName: string, rating: number}>; //calculated type
+  rating: number; //calculated type
 };
 
 export type CountriesList = Array<Country>;
