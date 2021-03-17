@@ -16,9 +16,8 @@ API for travel-app
   - GET `/user-info` - respond with { login: string } [3]
   - POST `/countries/:id/vote` - gives user ability to vote for a country requires { rating: number } [3]
 
-[1] application uses Heroku free account. That is why from time to time application can be in sleeping mode if it is not used for a while. In order to wake it up make request and wait for couple of minutes and try again. By this time it has to be active again. 
+[1] application uses Heroku free account. That is why from time to time application can be in sleeping mode if it is not used for a while. In order to wake it up make request and wait for couple of minutes and try again. By this time it has to be active again.
 
 [2] language param is optional, by default API returns everything in English
 
 [3] endpoint requires authorization header
-
