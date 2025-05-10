@@ -2,7 +2,7 @@
 
 API for travel-app
 
-##Deploy:
+## Deploy:
 
 - [Deploy on Heroku travel-app](https://oktravel.herokuapp.com/countries) [1]
 - Available endpoints:
